@@ -1,6 +1,5 @@
 import {
   pgTable,
-  foreignKey,
   pgEnum,
   uuid,
   timestamp,
