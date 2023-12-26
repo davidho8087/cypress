@@ -2,6 +2,7 @@
   "name": "cypress",
   "version": "0.1.0",
   "private": true,
+  "description": "Build a SaaS App with Realtime cursors, Next.js 14, Stripe, Drizzle ORM, Tailwind, Supabase, Sockets",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
