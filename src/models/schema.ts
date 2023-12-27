@@ -24,7 +24,7 @@ export const folders = pgTable('folders', {
   id: uuid('id').defaultRandom().primaryKey().notNull(),
   createdAt: timestamp('created_at', {
     withTimezone: true,
-    mode: 'string',
+    mode: 'string'
   })
     .defaultNow()
     .notNull(),
@@ -36,16 +36,16 @@ export const folders = pgTable('folders', {
   workspaceId: uuid('workspace_id')
     .notNull()
     .references(() => workspaces.id, {
-      onDelete: 'cascade',
-    }),
-});
+      onDelete: 'cascade'
+    })
+})
 
 
 export const files = pgTable('files', {
   id: uuid('id').defaultRandom().primaryKey().notNull(),
   createdAt: timestamp('created_at', {
     withTimezone: true,
-    mode: 'string',
+    mode: 'string'
   })
     .defaultNow()
     .notNull(),
@@ -57,14 +57,14 @@ export const files = pgTable('files', {
   workspaceId: uuid('workspace_id')
     .notNull()
     .references(() => workspaces.id, {
-      onDelete: 'cascade',
+      onDelete: 'cascade'
     }),
   folderId: uuid('folder_id')
     .notNull()
     .references(() => folders.id, {
-      onDelete: 'cascade',
-    }),
-});
+      onDelete: 'cascade'
+    })
+})
 
 export const subscriptions = pgTable('subscriptions', {
   id: text('id').primaryKey().notNull(),
