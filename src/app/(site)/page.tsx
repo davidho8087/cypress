@@ -99,9 +99,9 @@ const HomePage = () => {
           after:dark:from-brand-dark
         "
         >
-          {[...Array(2)].map((arr) => (
+          {[...Array(2)].map((_, index) => (
             <div
-              key={arr}
+              key={index}
               className="animate-slide
                 flex
                 flex-nowrap
@@ -211,9 +211,9 @@ const HomePage = () => {
                   'flex-row-reverse': index === 1,
                   'animate-[slide_250s_linear_infinite]': true,
                   'animate-[slide_250s_linear_infinite_reverse]': index === 1,
-                  'ml-[100vw]': index === 1,
+                  'ml-[100vw]': index === 1
                 }),
-                'hover:paused',
+                'hover:paused'
               )}
             >
               {USERS.map((testimonial, index) => (
@@ -287,8 +287,8 @@ const HomePage = () => {
                 'background-blur-3xl relative w-[300px] rounded-2xl dark:bg-black/40',
                 {
                   'border-brand-primaryPurple/70':
-                    card.planType === PRICING_PLANS.proPlan,
-                },
+                    card.planType === PRICING_PLANS.proPlan
+                }
               )}
               cardHeader={
                 <CardTitle

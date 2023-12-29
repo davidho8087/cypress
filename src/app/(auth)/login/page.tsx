@@ -7,7 +7,7 @@ import {
   FormDescription,
   FormField,
   FormItem,
-  FormMessage,
+  FormMessage
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { FormSchema } from '@/lib/types'
@@ -19,6 +19,7 @@ import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import * as z from 'zod'
 import Logo from '../../../../public/cypresslogo.svg'
+import { actionLoginUser } from '@/lib/server-actions/auth-actions'
 
 function LoginPage() {
   const router = useRouter()
@@ -27,14 +28,19 @@ function LoginPage() {
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onChange',
     resolver: zodResolver(FormSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: '', password: '' }
   })
 
   const isLoading = form.formState.isSubmitting
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (
-    formData,
+    formData
   ) => {
+    const { error } = await actionLoginUser(formData)
+    if (error) {
+      form.reset()
+      setSubmitError(error.message)
+    }
     router.replace('/dashboard')
   }
   return (
