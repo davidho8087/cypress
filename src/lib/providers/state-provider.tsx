@@ -1,122 +1,96 @@
-// 'use client'
+'use client'
 
-// import { usePathname } from 'next/navigation'
-// import {
-//   Dispatch,
-//   createContext,
-//   useContext,
-//   useEffect,
-//   useMemo,
-//   useReducer,
-// } from 'react'
-// import { File, Folder, Workspace } from '../supabase/types'
+// Define our AppState structure
+import { Folder, Workspace } from '@/lib/supabase/types'
+import { usePathname } from 'next/navigation'
+import React, {
+  Dispatch,
+  createContext,
+  useContext,
+  useMemo,
+  useReducer,
+} from 'react'
 
-// export type appFoldersType = Folder & { files: File[] | [] }
-// export type appWorkspacesType = Workspace & {
-//   folders: appFoldersType[] | []
-// }
+// Define our AppState structure
+type AppState = {
+  workspaces: appWorkspacesType[] | []
+}
 
-// interface AppState {
-//   workspaces: appWorkspacesType[] | []
-// }
+// Define our initial state
+const initialState: AppState = { workspaces: [] }
 
-// type Action = { type: 'ADD_WORKSPACE'; payload: appWorkspacesType }
+// Define appFoldersType
+export type appFoldersType = Folder & { files: File[] | [] }
 
-// const initialState: AppState = { workspaces: [] }
+// Define appWorkspacesType
+export type appWorkspacesType = Workspace & {
+  folders: appFoldersType[] | []
+}
 
-// const appReducer = (
-//   state: AppState = initialState,
-//   action: Action,
-// ): AppState => {
-//   switch (action.type) {
-//     case 'ADD_WORKSPACE':
-//       return {
-//         ...state,
-//         workspaces: [...state.workspaces, action.payload],
-//       }
-//     default:
-//       return initialState
-//   }
-// }
+// Define our action types
+type ActionType = {
+  type: 'ADD_WORKSPACE'
+  payload: appWorkspacesType
+}
 
-// const AppStateContext = createContext<
-//   | {
-//       state: AppState
-//       dispatch: Dispatch<Action>
-//       workspaceId: string | undefined
-//       folderId: string | undefined
-//       fileId: string | undefined
-//     }
-//   | undefined
-// >(undefined)
+// Define our reducer
+const reducer = (
+  state: AppState = initialState,
+  action: ActionType,
+): AppState => {
+  switch (action.type) {
+    case 'ADD_WORKSPACE':
+      return {
+        ...state,
+        workspaces: [action.payload, ...state.workspaces],
+      }
+    default:
+      return initialState
+  }
+}
 
-// interface AppStateProviderProps {
-//   children: React.ReactNode
-// }
+// Define our context
+const AppStateContext = createContext({
+  state: initialState,
+  dispatch: () => null, // placeholder dispatch function
+  workspaceId: undefined, // placeholder for workspaceId
+} as {
+  state: AppState
+  dispatch: Dispatch<any>
+  workspaceId: string | undefined
+})
 
-// const AppStateProvider: React.FC<AppStateProviderProps> = ({ children }) => {
-//   const [state, dispatch] = useReducer(appReducer, initialState)
-//   const pathname = usePathname()
+interface AppStateProviderProps {
+  children: React.ReactNode
+}
 
-//   const workspaceId = useMemo(() => {
-//     const urlSegments = pathname?.split('/').filter(Boolean)
-//     if (urlSegments)
-//       if (urlSegments.length > 1) {
-//         return urlSegments[1]
-//       }
-//   }, [pathname])
+// Define our provider (EXPORT)
+const AppStateProvider = ({ children }: AppStateProviderProps) => {
+  const [state, dispatch] = useReducer(reducer, initialState)
+  const pathname = usePathname()
 
-//   const folderId = useMemo(() => {
-//     const urlSegments = pathname?.split('/').filter(Boolean)
-//     if (urlSegments)
-//       if (urlSegments?.length > 2) {
-//         return urlSegments[2]
-//       }
-//   }, [pathname])
+  const workspaceId = useMemo(() => {
+    const urlSegments = pathname?.split('/').filter(Boolean)
+    if (urlSegments)
+      if (urlSegments.length > 1) {
+        return urlSegments[1]
+      }
+  }, [pathname])
 
-//   const fileId = useMemo(() => {
-//     const urlSegments = pathname?.split('/').filter(Boolean)
-//     if (urlSegments)
-//       if (urlSegments?.length > 3) {
-//         return urlSegments[3]
-//       }
-//   }, [pathname])
+  return (
+    <AppStateContext.Provider value={{ state, dispatch, workspaceId }}>
+      {children}
+    </AppStateContext.Provider>
+  )
+}
 
-//   useEffect(() => {
-//     if (!folderId || !workspaceId) return
-//     const fetchFiles = async () => {
-//       const { error: filesError, data } = await getFiles(folderId)
-//       if (filesError) {
-//         console.log(filesError)
-//       }
-//       if (!data) return
-//       dispatch({
-//         type: 'SET_FILES',
-//         payload: { workspaceId, files: data, folderId },
-//       })
-//     }
-//     fetchFiles()
-//   }, [folderId, workspaceId])
+export default AppStateProvider
 
-//   useEffect(() => {
-//     console.log('App State Changed', state)
-//   }, [state])
-
-//   return (
-//     <AppStateContext.Provider
-//       value={{ state, dispatch, workspaceId, folderId, fileId }}
-//     >
-//       {children}
-//     </AppStateContext.Provider>
-//   )
-// }
-
-// export default AppStateProvider
-
-// export const useAppState = () => {
-//   const context = useContext(AppStateContext)
-//   if (!context) {
-//     throw new Error('useAppState must be used within an AppStateProvider')
-//   }
-//   return context
-// }
+// Define a hook for easy access to our AppState (EXPORT)
+export const useAppState = () => {
+  const context = useContext(AppStateContext)
+  if (!context) {
+    throw new Error('useAppState must be used within an AppStateProvider')
+  }
+  return context
+}
