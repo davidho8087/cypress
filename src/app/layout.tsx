@@ -1,9 +1,11 @@
+import AppStateProvider from '@/lib/providers/state-provider'
 import { ThemeProvider } from '@/lib/providers/theme-provider'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { DM_Sans } from 'next/font/google'
+import { twMerge } from 'tailwind-merge'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = DM_Sans({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -17,9 +19,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={twMerge('bg-background', inter.className)}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          {children}
+          <AppStateProvider>{children}</AppStateProvider>
         </ThemeProvider>
       </body>
     </html>
