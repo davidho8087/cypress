@@ -1,12 +1,20 @@
-import { boolean, integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
-import { prices, subscriptionStatus } from '../../migrations/schema'
+import {
+  boolean,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core'
+import { prices, subscriptionStatus, users } from '../../migrations/schema'
 
 export const workspaces = pgTable('workspaces', {
   id: uuid('id').defaultRandom().primaryKey().notNull(),
   createdAt: timestamp('created_at', {
     withTimezone: true,
-    mode: 'string'
+    mode: 'string',
   })
     .defaultNow()
     .notNull(),
@@ -16,15 +24,14 @@ export const workspaces = pgTable('workspaces', {
   data: text('data'),
   inTrash: text('in_trash'),
   logo: text('logo'),
-  bannerUrl: text('banner_url')
+  bannerUrl: text('banner_url'),
 })
-
 
 export const folders = pgTable('folders', {
   id: uuid('id').defaultRandom().primaryKey().notNull(),
   createdAt: timestamp('created_at', {
     withTimezone: true,
-    mode: 'string'
+    mode: 'string',
   })
     .defaultNow()
     .notNull(),
@@ -36,16 +43,15 @@ export const folders = pgTable('folders', {
   workspaceId: uuid('workspace_id')
     .notNull()
     .references(() => workspaces.id, {
-      onDelete: 'cascade'
-    })
+      onDelete: 'cascade',
+    }),
 })
-
 
 export const files = pgTable('files', {
   id: uuid('id').defaultRandom().primaryKey().notNull(),
   createdAt: timestamp('created_at', {
     withTimezone: true,
-    mode: 'string'
+    mode: 'string',
   })
     .defaultNow()
     .notNull(),
@@ -57,13 +63,13 @@ export const files = pgTable('files', {
   workspaceId: uuid('workspace_id')
     .notNull()
     .references(() => workspaces.id, {
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     }),
   folderId: uuid('folder_id')
     .notNull()
     .references(() => folders.id, {
-      onDelete: 'cascade'
-    })
+      onDelete: 'cascade',
+    }),
 })
 
 export const subscriptions = pgTable('subscriptions', {
@@ -74,18 +80,55 @@ export const subscriptions = pgTable('subscriptions', {
   priceId: text('price_id').references(() => prices.id),
   quantity: integer('quantity'),
   cancelAtPeriodEnd: boolean('cancel_at_period_end'),
-  created: timestamp('created', { withTimezone: true, mode: 'string' }).default(sql`now()`).notNull(),
+  created: timestamp('created', { withTimezone: true, mode: 'string' })
+    .default(sql`now()`)
+    .notNull(),
   currentPeriodStart: timestamp('current_period_start', {
     withTimezone: true,
-    mode: 'string'
-  }).default(sql`now()`).notNull(),
+    mode: 'string',
+  })
+    .default(sql`now()`)
+    .notNull(),
   currentPeriodEnd: timestamp('current_period_end', {
     withTimezone: true,
-    mode: 'string'
-  }).default(sql`now()`).notNull(),
-  endedAt: timestamp('ended_at', { withTimezone: true, mode: 'string' }).default(sql`now()`),
-  cancelAt: timestamp('cancel_at', { withTimezone: true, mode: 'string' }).default(sql`now()`),
-  canceledAt: timestamp('canceled_at', { withTimezone: true, mode: 'string' }).default(sql`now()`),
-  trialStart: timestamp('trial_start', { withTimezone: true, mode: 'string' }).default(sql`now()`),
-  trialEnd: timestamp('trial_end', { withTimezone: true, mode: 'string' }).default(sql`now()`)
+    mode: 'string',
+  })
+    .default(sql`now()`)
+    .notNull(),
+  endedAt: timestamp('ended_at', {
+    withTimezone: true,
+    mode: 'string',
+  }).default(sql`now()`),
+  cancelAt: timestamp('cancel_at', {
+    withTimezone: true,
+    mode: 'string',
+  }).default(sql`now()`),
+  canceledAt: timestamp('canceled_at', {
+    withTimezone: true,
+    mode: 'string',
+  }).default(sql`now()`),
+  trialStart: timestamp('trial_start', {
+    withTimezone: true,
+    mode: 'string',
+  }).default(sql`now()`),
+  trialEnd: timestamp('trial_end', {
+    withTimezone: true,
+    mode: 'string',
+  }).default(sql`now()`),
+})
+
+export const collaborators = pgTable('collaborators', {
+  id: uuid('id').defaultRandom().primaryKey().notNull(),
+  workspaceId: uuid('workspace_id')
+    .notNull()
+    .references(() => workspaces.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at', {
+    withTimezone: true,
+    mode: 'string',
+  })
+    .defaultNow()
+    .notNull(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
 })
